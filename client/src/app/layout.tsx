@@ -11,7 +11,8 @@ const dmSans = DM_Sans({
 
 export const metadata: Metadata = {
   title: "LMS Website",
-  description: "From beginner to advance, in all industries, we have the right courses just for you and preparing your entire journey for learning and making the most",
+  description:
+    "From beginner to advance, in all industries, we have the right courses just for you and preparing your entire journey for learning and making the most",
 };
 
 export default function RootLayout({
@@ -22,7 +23,9 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body className={`${dmSans.className}`}>
-        <Providers>{children}</Providers>
+        <Providers>
+          <div className="root-layout">{children}</div>
+        </Providers>
       </body>
     </html>
   );
