@@ -9,6 +9,7 @@ import Loading from "@/components/Loading";
 import { cn } from "@/lib/utils";
 import { Sidebar, SidebarProvider } from "@/components/ui/sidebar";
 import AppSidebar from "@/components/AppSidebar";
+import Navbar from "@/components/Navbar";
 
 export default function DashboardLayout({
   children,
@@ -32,6 +33,7 @@ export default function DashboardLayout({
         <div className="dashboard__content">
           {/* chapter | sidebar */}
           <div className={cn("dashboard__main")} style={{ height: "100vh" }}>
+            <Navbar />
             <main className="dashboard__body">{children}</main>
           </div>
         </div>
