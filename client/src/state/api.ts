@@ -23,10 +23,6 @@ const customBaseQuery = async (
     },
   });
 
-  // Log the full URL
-  const url = typeof args === "string" ? args : args.url;
-  console.log("Request URL:", `${process.env.NEXT_PUBLIC_API_BASE_URL}${url}`);
-  console.log("Full args:", args); // Add this
 
   try {
     const result: any = await baseQuery(args, api, extraOptions);
@@ -50,6 +46,11 @@ const customBaseQuery = async (
 
     if (result.data) {
       result.data = result.data.data;
+    } else if (
+      result.error?.status === 204 ||
+      result.meta?.response?.status === 204
+    ) {
+      return { data: null };
     }
 
     return result;
@@ -92,8 +93,24 @@ export const api = createApi({
         },
       ],
     }),
+
+    // stripe payment intent
+    createStripePaymentIntent: build.mutation<
+      { clientSecret: string },
+      { amount?: number }
+    >({
+      query: ({ amount }) => ({
+        url: `/transactions/stripe/payment-intent`,
+        method: "POST",
+        body: { amount },
+      }),
+    }),
   }),
 });
 
-export const { useUpdateUserMutation, useGetCoursesQuery, useGetCourseQuery } =
-  api;
+export const {
+  useUpdateUserMutation,
+  useGetCoursesQuery,
+  useGetCourseQuery,
+  useCreateStripePaymentIntentMutation,
+} = api;

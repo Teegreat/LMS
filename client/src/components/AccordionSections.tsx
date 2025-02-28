@@ -1,8 +1,14 @@
-import React from 'react'
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from './ui/accordion'
-import { FileText } from 'lucide-react';
+import React from "react";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
+import { FileText } from "lucide-react";
 
-const AccordionSections = ({sections}: AccordionSectionsProps) => {
+const AccordionSections = ({ sections }: AccordionSectionsProps) => {
+ 
   return (
     <Accordion type="multiple" className="w-full">
       {sections.map((section) => (
@@ -17,11 +23,12 @@ const AccordionSections = ({sections}: AccordionSectionsProps) => {
           <AccordionContent className="accordion-section__content">
             <ul>
               {section.chapters.map((chapter) => (
-                <li key={chapter.chapterId} className="accordion-section__chapter">
-                    <FileText className='mr-2 w-4 h-4' />
-                    <span className="text-sm">
-                        {chapter.title}
-                    </span>
+                <li
+                  key={chapter.chapterId}
+                  className="accordion-section__chapter"
+                >
+                  <FileText className="mr-2 w-4 h-4" />
+                  <span className="text-sm">{chapter.title}</span>
                 </li>
               ))}
             </ul>
@@ -30,6 +37,6 @@ const AccordionSections = ({sections}: AccordionSectionsProps) => {
       ))}
     </Accordion>
   );
-}
+};
 
-export default AccordionSections
+export default AccordionSections;

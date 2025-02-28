@@ -1,4 +1,4 @@
-"use client";
+"use client"
 
 import { useUser } from "@clerk/nextjs";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -15,13 +15,10 @@ export const useCheckoutNavigation = () => {
   const navigateToStep = useCallback(
     (step: number) => {
       const newStep = Math.min(Math.max(1, step), 3);
-      const showSignUp = isSignedIn ? "true" : "false";
+      const showSignup = isSignedIn ? "true" : "false";
 
       router.push(
-        `/checkout?step=${newStep}&id=${courseId}&showSignUp=${showSignUp}`,
-        {
-          scroll: false,
-        }
+        `/checkout?step=${newStep}&id=${courseId}&showSignup=${showSignup}`
       );
     },
     [courseId, isSignedIn, router]
@@ -31,7 +28,7 @@ export const useCheckoutNavigation = () => {
     if (isLoaded && !isSignedIn && checkoutStep > 1) {
       navigateToStep(1);
     }
-  }, [isLoaded, isSignedIn, checkoutStep, navigateToStep]);
+  },[checkoutStep, isLoaded, isSignedIn, navigateToStep]);
 
   return { checkoutStep, navigateToStep };
 };
