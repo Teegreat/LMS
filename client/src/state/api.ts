@@ -23,7 +23,6 @@ const customBaseQuery = async (
     },
   });
 
-
   try {
     const result: any = await baseQuery(args, api, extraOptions);
 
@@ -94,6 +93,11 @@ export const api = createApi({
       ],
     }),
 
+    // Get Transactions
+    getTransactions: build.query<Transaction[], string>({
+      query: (userId) => `transactions?userId=${userId}`,
+    }),
+
     // stripe payment intent
     createStripePaymentIntent: build.mutation<
       { clientSecret: string },
@@ -105,6 +109,15 @@ export const api = createApi({
         body: { amount },
       }),
     }),
+
+    // create transaction
+    createTransaction: build.mutation<Transaction, Partial<Transaction>>({
+      query: (transaction) => ({
+        url: "/transactions",
+        method: "POST",
+        body: transaction,
+      }),
+    }),
   }),
 });
 
@@ -112,5 +125,7 @@ export const {
   useUpdateUserMutation,
   useGetCoursesQuery,
   useGetCourseQuery,
+  useGetTransactionsQuery,
+  useCreateTransactionMutation,
   useCreateStripePaymentIntentMutation,
 } = api;
