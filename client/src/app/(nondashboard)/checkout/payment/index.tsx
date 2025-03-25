@@ -6,7 +6,6 @@ import {
   useStripe,
 } from "@stripe/react-stripe-js";
 import {
-  useCreateStripePaymentIntentMutation,
   useCreateTransactionMutation,
 } from "@/state/api";
 import { useCheckoutNavigation } from "@/hooks/useCheckoutNavigation";
@@ -36,10 +35,16 @@ const PaymentPageContent = () => {
       return;
     }
 
+      const baseUrl = process.env.NEXT_PUBLIC_LOCAL_URL
+        ? `http://${process.env.NEXT_PUBLIC_LOCAL_URL}`
+        : process.env.NEXT_PUBLIC_VERCEL_URL
+        ? `https://${process.env.NEXT_PUBLIC_VERCEL_URL}`
+        : undefined;
+
     const result = await stripe.confirmPayment({
       elements,
       confirmParams: {
-        return_url: `${process.env.NEXT_PUBLIC_STRIPE_REDIRECT_URL}?id=${courseId}`,
+        return_url: `${baseUrl}/checkout?step=3&id=${courseId}`,
       },
       redirect: "if_required",
     });

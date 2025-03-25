@@ -1,12 +1,12 @@
 "use client";
 
-import { useRef } from "react";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
-import ReactPlayer from "react-player";
 import Loading from "@/components/Loading";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useCourseProgressData } from "@/hooks/useCourseProgressData";
+import React, { useRef } from "react";
+import ReactPlayer from "react-player";
 
 const Course = () => {
   const {
@@ -21,6 +21,7 @@ const Course = () => {
     hasMarkedComplete,
     setHasMarkedComplete,
   } = useCourseProgressData();
+
   console.log("currentChapter.video:", currentChapter);
 
   const playerRef = useRef<ReactPlayer>(null);
@@ -53,10 +54,11 @@ const Course = () => {
         <div className="course__breadcrumb">
           <div className="course__path">
             {course.title} / {currentSection?.sectionTitle} /{" "}
-            <span className="course__current-chapter">
+            <span className="course__curent-chapter">
               {currentChapter?.title}
             </span>
           </div>
+
           <h2 className="course__title">{currentChapter?.title}</h2>
           <div className="course__header">
             <div className="course__instructor">
@@ -92,15 +94,15 @@ const Course = () => {
                 }}
               />
             ) : (
-              <div className="course__no-video">
-                No video available for this chapter.
+              <div className="course_no-video">
+                No video available for this chapter
               </div>
             )}
           </CardContent>
         </Card>
 
         <div className="course__content">
-          <Tabs defaultValue="Notes" className="course__tabs">
+          <Tabs className="course__tabs" defaultValue="Notes">
             <TabsList className="course__tabs-list">
               <TabsTrigger className="course__tab" value="Notes">
                 Notes
@@ -124,7 +126,7 @@ const Course = () => {
               </Card>
             </TabsContent>
 
-            <TabsContent className="course__tab-content" value="Resources">
+            <TabsContent className="course__tab-content" value="Notes">
               <Card className="course__tab-card">
                 <CardHeader className="course__tab-header">
                   <CardTitle>Resources Content</CardTitle>

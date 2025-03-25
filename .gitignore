@@ -35,7 +35,11 @@ yarn-error.log*
 
 server/node_modules
 server/.env
-client/.env
+client/.env.local
+client/.env.development
+client/.env.production
+
+client/.next
 
 # vercel
 .vercel
@@ -43,3 +47,13 @@ client/.env
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+
+**/node_modules
+**/dist
+
+.vscode/
+
+server/shared-local-instance.db
+server/dynamodb-local-metadata.json
+shared-local-instance.db

@@ -1,4 +1,5 @@
-"use client"
+"use client";
+
 import { SignUp, useUser } from "@clerk/nextjs";
 import React from "react";
 import { dark } from "@clerk/themes";
@@ -11,12 +12,12 @@ const SignUpComponent = () => {
   const courseId = searchParams.get("id");
 
   const signInUrl = isCheckoutPage
-    ? `/checkout?step=1$id=${courseId}&showSignUp=false`
+    ? `/checkout?step=1&id=${courseId}&showSignUp=false`
     : "/signin";
 
   const getRedirectUrl = () => {
     if (isCheckoutPage) {
-      return `/checkout?step=2&id=${courseId}&showSignUp=true`;
+      return `/checkout?step=2&id=${courseId}&showSignUp=false`;
     }
 
     const userType = user?.publicMetadata?.userType as string;
@@ -25,6 +26,7 @@ const SignUpComponent = () => {
     }
     return "/user/courses";
   };
+
   return (
     <SignUp
       appearance={{
@@ -34,17 +36,16 @@ const SignUpComponent = () => {
           cardBox: "shadow-none",
           card: "bg-customgreys-secondarybg w-full shadow-none",
           footer: {
-            background: "#25262f",
+            background: "#25262F",
             padding: "0rem 2.5rem",
             "& > div > div:nth-child(1)": {
-              background: "#25262f",
+              background: "#25262F",
             },
           },
           formFieldLabel: "text-white-50 font-normal",
           formButtonPrimary:
             "bg-primary-700 text-white-100 hover:bg-primary-600 !shadow-none",
-          formFieldInput:
-            "bg-customgreys-primarybg text-white-50 !shadow-none ",
+          formFieldInput: "bg-customgreys-primarybg text-white-50 !shadow-none",
           footerActionLink: "text-primary-750 hover:text-primary-600",
         },
       }}

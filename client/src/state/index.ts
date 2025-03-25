@@ -27,6 +27,7 @@ export const globalSlice = createSlice({
     setSections: (state, action: PayloadAction<Section[]>) => {
       state.courseEditor.sections = action.payload;
     },
+    
     openChapterModal: (
       state,
       action: PayloadAction<{

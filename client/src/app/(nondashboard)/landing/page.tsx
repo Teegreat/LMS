@@ -45,16 +45,21 @@ const LoadingSkeleton = () => {
 };
 
 const Landing = () => {
-
-  const router = useRouter()
+  const router = useRouter();
   const currentImage = useCarousel({ totalImages: 3 });
-  const { data: courses, isLoading, isError } = useGetCoursesQuery({});
+  const { data: courses, isLoading,  } = useGetCoursesQuery({});
+  const { user } = useUser();
 
   const handleCourseClick = (courseId: string) => {
-    router.push(`/search?id=${courseId}`)
-  }
+    router.push(`/search?id=${courseId}`, {
+      scroll: false,
+    });
+  };
 
   // console.log("Courses:", courses);
+
+  // Determine user type
+  // const userType = user?.publicMetadata?.userType as string;
 
   if (isLoading) return <LoadingSkeleton />;
 
@@ -65,6 +70,16 @@ const Landing = () => {
       transition={{ duration: 0.5 }}
       className="landing"
     >
+      {/* Add a conditional message or logic based on user type */}
+      {/* {isSignedIn && (
+        <div className="landing__user-info">
+          <p>
+            Welcome back, {user?.firstName}! You are signed in as a{" "}
+            {userType || "student"}.
+          </p>
+        </div>
+      )} */}
+
       <motion.div
         initial={{ y: 20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
@@ -79,7 +94,7 @@ const Landing = () => {
             Courses when you need them and want them.
           </p>
           <div className="landing__cta">
-            <Link href="/search">
+            <Link href="/search" scroll={false}>
               <div className="landing__cta-button">Search for Courses</div>
             </Link>
           </div>
@@ -137,7 +152,10 @@ const Landing = () => {
                 transition={{ duration: 0.5, delay: index * 0.2 }}
                 viewport={{ amount: 0.4 }}
               >
-                <CourseCardSearch course={course} onClick={() => handleCourseClick(course.courseId)} />
+                <CourseCardSearch
+                  course={course}
+                  onClick={() => handleCourseClick(course.courseId)}
+                />
               </motion.div>
             ))}
         </div>

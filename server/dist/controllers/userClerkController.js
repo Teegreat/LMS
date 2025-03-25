@@ -18,8 +18,8 @@ const updateUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
         const user = yield index_1.clerkClient.users.updateUserMetadata(userId, {
             publicMetadata: {
                 userType: userData.publicMetadata.userType,
-                settings: userData.publicMetadata.settings
-            }
+                settings: userData.publicMetadata.settings,
+            },
         });
         res.json({ message: "User updated successfully", data: user });
     }

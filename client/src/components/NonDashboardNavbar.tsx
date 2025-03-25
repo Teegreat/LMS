@@ -13,12 +13,13 @@ const NonDashboardNavbar = () => {
     <nav className="nondashboard-navbar">
       <div className="nondashboard-navbar__container">
         <div className="nondashboard-navbar__search">
-          <Link href="/" className="nondashboard-navbar__brand">
-            EDROH
+          <Link scroll={false} href="/" className="nondashboard-navbar__brand">
+            EDROH-LEARN
           </Link>
           <div className="flex items-center gap-4">
             <div className="relative group">
               <Link
+                scroll={false}
                 href="/search"
                 className="nondashboard-navbar__search-input"
               >
@@ -39,14 +40,14 @@ const NonDashboardNavbar = () => {
           </button>
 
           {/* SIGN IN BUTTONS */}
-          <SignedIn >
-            <UserButton 
+          <SignedIn>
+            <UserButton
               appearance={{
                 baseTheme: dark,
                 elements: {
                   userButtonOuterIdentifier: "text-customgreys-dirtyGrey ",
-                  userButtonBox: "scale-90 sm:scale-100"
-                }
+                  userButtonBox: "scale-90 sm:scale-100",
+                },
               }}
               showName={true}
               userProfileMode="navigation"
@@ -56,10 +57,18 @@ const NonDashboardNavbar = () => {
             />
           </SignedIn>
           <SignedOut>
-            <Link href="/signin" className="nondashboard-navbar__auth-button--login">
+            <Link
+              scroll={false}
+              href="/signin"
+              className="nondashboard-navbar__auth-button--login"
+            >
               Log In
             </Link>
-            <Link href="/signup" className="nondashboard-navbar__auth-button--signup">
+            <Link
+              scroll={false}
+              href="/signup"
+              className="nondashboard-navbar__auth-button--signup"
+            >
               Sign Up
             </Link>
           </SignedOut>

@@ -8,7 +8,7 @@ const TeacherProfilePage = () => {
     <>
       <Header title="Profile" subtitle="View your profile" />
       <UserProfile
-        path="/user/teacher"
+        path="/teacher/profile"
         routing="path"
         appearance={{
           baseTheme: dark,

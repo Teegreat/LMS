@@ -1,21 +1,21 @@
-import { useState, useEffect, useRef } from "react";
+import Loading from "@/components/Loading";
+import { useSidebar } from "@/components/ui/sidebar";
+import { useCourseProgressData } from "@/hooks/useCourseProgressData";
+import { cn } from "@/lib/utils";
 import {
+  CheckCircle,
   ChevronDown,
   ChevronUp,
   FileText,
-  CheckCircle,
   Trophy,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { cn } from "@/lib/utils";
-import { useSidebar } from "@/components/ui/sidebar";
-import Loading from "@/components/Loading";
-import { useCourseProgressData } from "@/hooks/useCourseProgressData";
+import React, { useEffect, useRef } from "react";
 
 const ChaptersSidebar = () => {
   const router = useRouter();
   const { setOpen } = useSidebar();
-  const [expandedSections, setExpandedSections] = useState<string[]>([]);
+  const [expandedSections, setExpandedSections] = React.useState<string[]>([]);
 
   const {
     user,
@@ -99,7 +99,7 @@ const Section = ({
   updateChapterProgress: (
     sectionId: string,
     chapterId: string,
-    completed: boolean
+    isCompleted: boolean
   ) => void;
 }) => {
   const completedChapters =
@@ -127,6 +127,7 @@ const Section = ({
           {section.sectionTitle}
         </h3>
       </div>
+
       <hr className="chapters-sidebar__divider" />
 
       {isExpanded && (
@@ -137,6 +138,7 @@ const Section = ({
             completedChapters={completedChapters}
             totalChapters={totalChapters}
           />
+
           <ChaptersList
             section={section}
             sectionProgress={sectionProgress}
@@ -209,7 +211,7 @@ const ChaptersList = ({
   updateChapterProgress: (
     sectionId: string,
     chapterId: string,
-    completed: boolean
+    isCompleted: boolean
   ) => void;
 }) => {
   return (
@@ -251,7 +253,7 @@ const Chapter = ({
   updateChapterProgress: (
     sectionId: string,
     chapterId: string,
-    completed: boolean
+    isCompleted: boolean
   ) => void;
 }) => {
   const chapterProgress = sectionProgress?.chapters.find(
@@ -290,6 +292,7 @@ const Chapter = ({
           {index + 1}
         </div>
       )}
+
       <span
         className={cn("chapters-sidebar__chapter-title", {
           "chapters-sidebar__chapter-title--completed": isCompleted,

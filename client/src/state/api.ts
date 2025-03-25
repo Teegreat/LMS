@@ -3,8 +3,8 @@ import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import { BaseQueryApi, FetchArgs } from "@reduxjs/toolkit/query";
 
 import { User } from "@clerk/nextjs/server";
-import { Clerk } from "@clerk/clerk-js";
 import { toast } from "sonner";
+import { Clerk } from "@clerk/clerk-js";
 
 // custom base query
 const customBaseQuery = async (
@@ -64,8 +64,9 @@ const customBaseQuery = async (
 export const api = createApi({
   baseQuery: customBaseQuery,
   reducerPath: "api",
-  tagTypes: ["Courses", "Users"],
+  tagTypes: ["Courses", "Users", "UserCourseProgress"],
   endpoints: (build) => ({
+    // Clerk User
     updateUser: build.mutation<User, Partial<User> & { userId: string }>({
       query: ({ userId, ...updateUser }) => ({
         url: `users/clerk/${userId}`,
@@ -74,6 +75,8 @@ export const api = createApi({
       }),
       invalidatesTags: ["Users"],
     }),
+
+    // Get Courses
     getCourses: build.query<Course[], { category?: string }>({
       query: ({ category }) => ({
         url: "courses",
@@ -91,6 +94,72 @@ export const api = createApi({
           id,
         },
       ],
+    }),
+
+    // Create Course
+    createCourse: build.mutation<
+      Course,
+      {
+        teacherId: string;
+        teacherName: string;
+      }
+    >({
+      query: (body) => ({
+        url: `courses`,
+        method: "POST",
+        body,
+      }),
+      invalidatesTags: ["Courses"],
+    }),
+
+    // Update Course
+    updateCourse: build.mutation<
+      Course,
+      {
+        courseId: string;
+        formData: FormData;
+      }
+    >({
+      query: ({ courseId, formData }) => ({
+        url: `courses/${courseId}`,
+        method: "PUT",
+        body: formData,
+      }),
+      invalidatesTags: (result, error, { courseId }) => [
+        { type: "Courses", id: courseId },
+      ],
+    }),
+
+    // delete Course
+    deleteCourse: build.mutation<
+      {
+        message: string;
+      },
+      string
+    >({
+      query: (courseId) => ({
+        url: `courses/${courseId}`,
+        method: "DELETE",
+      }),
+      invalidatesTags: ["Courses"],
+    }),
+
+    // Upload Video
+    getUploadVideoUrl: build.mutation<
+      { uploadUrl: string; videoUrl: string },
+      {
+        courseId: string;
+        sectionId: string;
+        chapterId: string;
+        fileName: string;
+        fileType: string;
+      }
+    >({
+      query: ({ courseId, sectionId, chapterId, fileName, fileType }) => ({
+        url: `courses/${courseId}/sections/${sectionId}/chapters/${chapterId}/get-upload-url`,
+        method: "POST",
+        body: { fileName, fileType },
+      }),
     }),
 
     // Get Transactions
@@ -118,14 +187,81 @@ export const api = createApi({
         body: transaction,
       }),
     }),
+
+    // USER ENROLLED COURSE
+    getUserEnrolledCourses: build.query<Course[], string>({
+      query: (userId) => `users/course-progress/${userId}/enrolled-courses`,
+      providesTags: ["Courses", "UserCourseProgress"],
+    }),
+
+    // USER COURSE PROGRESS
+    getUserCourseProgress: build.query<
+      UserCourseProgress,
+      {
+        userId: string;
+        courseId: string;
+      }
+    >({
+      query: ({ userId, courseId }) =>
+        `users/course-progress/${userId}/courses/${courseId}`,
+      providesTags: ["UserCourseProgress"],
+    }),
+
+    // UPDATE COURSE PROGRESS
+    updateUserCourseProgress: build.mutation<
+      UserCourseProgress,
+      {
+        userId: string;
+        courseId: string;
+        progressData: {
+          sections: SectionProgress[];
+        };
+      }
+    >({
+      query: ({ userId, courseId, progressData }) => ({
+        url: `users/course-progress/${userId}/courses/${courseId}`,
+        method: "PUT",
+        body: progressData,
+      }),
+      invalidatesTags: ["UserCourseProgress"],
+      async onQueryStarted(
+        { userId, courseId, progressData },
+        { dispatch, queryFulfilled }
+      ) {
+        const patchResult = dispatch(
+          api.util.updateQueryData(
+            "getUserCourseProgress",
+            { userId, courseId },
+            (draft) => {
+              Object.assign(draft, {
+                ...draft,
+                sections: progressData.sections,
+              });
+            }
+          )
+        );
+        try {
+          await queryFulfilled;
+        } catch {
+          patchResult.undo();
+        }
+      },
+    }),
   }),
 });
 
 export const {
+  useGetUploadVideoUrlMutation,
+  useUpdateUserCourseProgressMutation,
+  useGetUserCourseProgressQuery,
   useUpdateUserMutation,
+  useCreateCourseMutation,
+  useUpdateCourseMutation,
+  useDeleteCourseMutation,
   useGetCoursesQuery,
   useGetCourseQuery,
   useGetTransactionsQuery,
   useCreateTransactionMutation,
   useCreateStripePaymentIntentMutation,
+  useGetUserEnrolledCoursesQuery,
 } = api;
