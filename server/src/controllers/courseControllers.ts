@@ -11,23 +11,19 @@ export const listCourses = async (
   res: Response
 ): Promise<void> => {
   const { category } = req.query;
-
   try {
     const courses =
       category && category !== "all"
         ? await Course.scan("category").eq(category).exec()
         : await Course.scan().exec();
-
-    res.json({ message: "Courses retreived successfully ", data: courses });
+    res.json({ message: "Courses retrieved successfully", data: courses });
   } catch (error) {
-    res.status(500).json({ message: "Error retreiving courses", error });
+    res.status(500).json({ message: "Error retrieving courses", error });
   }
 };
 
-// single course
 export const getCourse = async (req: Request, res: Response): Promise<void> => {
   const { courseId } = req.params;
-
   try {
     const course = await Course.get(courseId);
     if (!course) {
@@ -35,13 +31,12 @@ export const getCourse = async (req: Request, res: Response): Promise<void> => {
       return;
     }
 
-    res.json({ message: "Course retreived successfully ", data: course });
+    res.json({ message: "Course retrieved successfully", data: course });
   } catch (error) {
-    res.status(500).json({ message: "Error retreiving course", error });
+    res.status(500).json({ message: "Error retrieving course", error });
   }
 };
 
-// create course
 export const createCourse = async (
   req: Request,
   res: Response
@@ -50,9 +45,7 @@ export const createCourse = async (
     const { teacherId, teacherName } = req.body;
 
     if (!teacherId || !teacherName) {
-      res.status(400).json({
-        message: "Teacher Id and name are required",
-      });
+      res.status(400).json({ message: "Teacher Id and name are required" });
       return;
     }
 
@@ -70,16 +63,14 @@ export const createCourse = async (
       sections: [],
       enrollments: [],
     });
-
     await newCourse.save();
 
-    res.json({ message: "Course created successfully ", data: newCourse });
+    res.json({ message: "Course created successfully", data: newCourse });
   } catch (error) {
     res.status(500).json({ message: "Error creating course", error });
   }
 };
 
-// update course
 export const updateCourse = async (
   req: Request,
   res: Response
@@ -90,16 +81,15 @@ export const updateCourse = async (
 
   try {
     const course = await Course.get(courseId);
-
     if (!course) {
       res.status(404).json({ message: "Course not found" });
       return;
     }
 
     if (course.teacherId !== userId) {
-      res.status(404).json({
-        message: "Not authorized to update this course",
-      });
+      res
+        .status(403)
+        .json({ message: "Not authorized to update this course " });
       return;
     }
 
@@ -131,18 +121,15 @@ export const updateCourse = async (
       }));
     }
 
-    // replace with the new object i.e the updateData
     Object.assign(course, updateData);
-
     await course.save();
 
-    res.json({ message: "Course updated successfully ", data: course });
+    res.json({ message: "Course updated successfully", data: course });
   } catch (error) {
     res.status(500).json({ message: "Error updating course", error });
   }
 };
 
-// delete course
 export const deleteCourse = async (
   req: Request,
   res: Response
@@ -152,24 +139,21 @@ export const deleteCourse = async (
 
   try {
     const course = await Course.get(courseId);
-
     if (!course) {
-      res.status(400).json({
-        message: "Course not found!",
-      });
+      res.status(404).json({ message: "Course not found" });
       return;
     }
 
     if (course.teacherId !== userId) {
-      res.status(400).json({
-        message: "Not autorized to delete this course!",
-      });
+      res
+        .status(403)
+        .json({ message: "Not authorized to delete this course " });
       return;
     }
 
     await Course.delete(courseId);
 
-    res.json({ message: "Course deleted successfully " });
+    res.json({ message: "Course deleted successfully", data: course });
   } catch (error) {
     res.status(500).json({ message: "Error deleting course", error });
   }
@@ -182,9 +166,7 @@ export const getUploadVideoUrl = async (
   const { fileName, fileType } = req.body;
 
   if (!fileName || !fileType) {
-    res.status(400).json({
-      message: "File nmae and type are required",
-    });
+    res.status(400).json({ message: "File name and type are required" });
     return;
   }
 
@@ -193,7 +175,7 @@ export const getUploadVideoUrl = async (
     const s3Key = `videos/${uniqueId}/${fileName}`;
 
     const s3Params = {
-      Bucket: process.env.AWS_BUCKET_NAME || "",
+      Bucket: process.env.S3_BUCKET_NAME || "",
       Key: s3Key,
       Expires: 60,
       ContentType: fileType,

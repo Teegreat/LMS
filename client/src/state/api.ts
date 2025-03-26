@@ -1,12 +1,9 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
-
 import { BaseQueryApi, FetchArgs } from "@reduxjs/toolkit/query";
-
 import { User } from "@clerk/nextjs/server";
-import { toast } from "sonner";
 import { Clerk } from "@clerk/clerk-js";
+import { toast } from "sonner";
 
-// custom base query
 const customBaseQuery = async (
   args: string | FetchArgs,
   api: BaseQueryApi,
@@ -47,7 +44,7 @@ const customBaseQuery = async (
       result.data = result.data.data;
     } else if (
       result.error?.status === 204 ||
-      result.meta?.response?.status === 204
+      result.meta?.response?.status === 24
     ) {
       return { data: null };
     }
@@ -66,17 +63,25 @@ export const api = createApi({
   reducerPath: "api",
   tagTypes: ["Courses", "Users", "UserCourseProgress"],
   endpoints: (build) => ({
-    // Clerk User
+    /* 
+    ===============
+    USER CLERK
+    =============== 
+    */
     updateUser: build.mutation<User, Partial<User> & { userId: string }>({
-      query: ({ userId, ...updateUser }) => ({
+      query: ({ userId, ...updatedUser }) => ({
         url: `users/clerk/${userId}`,
         method: "PUT",
-        body: updateUser,
+        body: updatedUser,
       }),
       invalidatesTags: ["Users"],
     }),
 
-    // Get Courses
+    /* 
+    ===============
+    COURSES
+    =============== 
+    */
     getCourses: build.query<Course[], { category?: string }>({
       query: ({ category }) => ({
         url: "courses",
@@ -85,24 +90,14 @@ export const api = createApi({
       providesTags: ["Courses"],
     }),
 
-    // single course
     getCourse: build.query<Course, string>({
       query: (id) => `courses/${id}`,
-      providesTags: (result, error, id) => [
-        {
-          type: "Courses",
-          id,
-        },
-      ],
+      providesTags: (result, error, id) => [{ type: "Courses", id }],
     }),
 
-    // Create Course
     createCourse: build.mutation<
       Course,
-      {
-        teacherId: string;
-        teacherName: string;
-      }
+      { teacherId: string; teacherName: string }
     >({
       query: (body) => ({
         url: `courses`,
@@ -112,13 +107,9 @@ export const api = createApi({
       invalidatesTags: ["Courses"],
     }),
 
-    // Update Course
     updateCourse: build.mutation<
       Course,
-      {
-        courseId: string;
-        formData: FormData;
-      }
+      { courseId: string; formData: FormData }
     >({
       query: ({ courseId, formData }) => ({
         url: `courses/${courseId}`,
@@ -130,13 +121,7 @@ export const api = createApi({
       ],
     }),
 
-    // delete Course
-    deleteCourse: build.mutation<
-      {
-        message: string;
-      },
-      string
-    >({
+    deleteCourse: build.mutation<{ message: string }, string>({
       query: (courseId) => ({
         url: `courses/${courseId}`,
         method: "DELETE",
@@ -144,13 +129,12 @@ export const api = createApi({
       invalidatesTags: ["Courses"],
     }),
 
-    // Upload Video
     getUploadVideoUrl: build.mutation<
       { uploadUrl: string; videoUrl: string },
       {
         courseId: string;
-        sectionId: string;
         chapterId: string;
+        sectionId: string;
         fileName: string;
         fileType: string;
       }
@@ -162,15 +146,17 @@ export const api = createApi({
       }),
     }),
 
-    // Get Transactions
+    /* 
+    ===============
+    TRANSACTIONS
+    =============== 
+    */
     getTransactions: build.query<Transaction[], string>({
       query: (userId) => `transactions?userId=${userId}`,
     }),
-
-    // stripe payment intent
     createStripePaymentIntent: build.mutation<
       { clientSecret: string },
-      { amount?: number }
+      { amount: number }
     >({
       query: ({ amount }) => ({
         url: `/transactions/stripe/payment-intent`,
@@ -178,36 +164,33 @@ export const api = createApi({
         body: { amount },
       }),
     }),
-
-    // create transaction
     createTransaction: build.mutation<Transaction, Partial<Transaction>>({
       query: (transaction) => ({
-        url: "/transactions",
+        url: "transactions",
         method: "POST",
         body: transaction,
       }),
     }),
 
-    // USER ENROLLED COURSE
+    /* 
+    ===============
+    USER COURSE PROGRESS
+    =============== 
+    */
     getUserEnrolledCourses: build.query<Course[], string>({
       query: (userId) => `users/course-progress/${userId}/enrolled-courses`,
       providesTags: ["Courses", "UserCourseProgress"],
     }),
 
-    // USER COURSE PROGRESS
     getUserCourseProgress: build.query<
       UserCourseProgress,
-      {
-        userId: string;
-        courseId: string;
-      }
+      { userId: string; courseId: string }
     >({
       query: ({ userId, courseId }) =>
         `users/course-progress/${userId}/courses/${courseId}`,
       providesTags: ["UserCourseProgress"],
     }),
 
-    // UPDATE COURSE PROGRESS
     updateUserCourseProgress: build.mutation<
       UserCourseProgress,
       {
@@ -251,17 +234,17 @@ export const api = createApi({
 });
 
 export const {
-  useGetUploadVideoUrlMutation,
-  useUpdateUserCourseProgressMutation,
-  useGetUserCourseProgressQuery,
   useUpdateUserMutation,
   useCreateCourseMutation,
   useUpdateCourseMutation,
   useDeleteCourseMutation,
   useGetCoursesQuery,
   useGetCourseQuery,
+  useGetUploadVideoUrlMutation,
   useGetTransactionsQuery,
   useCreateTransactionMutation,
   useCreateStripePaymentIntentMutation,
   useGetUserEnrolledCoursesQuery,
+  useGetUserCourseProgressQuery,
+  useUpdateUserCourseProgressMutation,
 } = api;
