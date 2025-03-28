@@ -163,32 +163,87 @@ export const getUploadVideoUrl = async (
   req: Request,
   res: Response
 ): Promise<void> => {
-  const { fileName, fileType } = req.body;
-
-  if (!fileName || !fileType) {
-    res.status(400).json({ message: "File name and type are required" });
-    return;
-  }
-
   try {
+    // Comprehensive request logging
+    // console.log(
+    //   JSON.stringify({
+    //     event: "uploadVideoUrlRequest",
+    //     requestBody: req.body,
+    //     requestHeaders: req.headers,
+    //     requestMethod: req.method,
+    //     requestPath: req.path,
+    //     timestamp: new Date().toISOString(),
+    //   })
+    // );
+
+    const { fileName, fileType } = req.body;
+
+    if (!fileName || !fileType) {
+      console.error("Validation Error: Missing fileName or fileType", {
+        fileName,
+        fileType,
+      });
+      res.status(400).json({ message: "File name and type are required" });
+      return;
+    }
+
+    // Detailed environment variable logging
+    // console.log(
+    //   JSON.stringify({
+    //     event: "environmentVariables",
+    //     S3_BUCKET_NAME: process.env.S3_BUCKET_NAME,
+    //     CLOUDFRONT_DOMAIN: process.env.CLOUDFRONT_DOMAIN,
+    //     NODE_ENV: process.env.NODE_ENV,
+    //   })
+    // );
+
     const uniqueId = uuidv4();
     const s3Key = `videos/${uniqueId}/${fileName}`;
 
+    // Possible fix for missing S3_BUCKET_NAME
+    if (!process.env.S3_BUCKET_NAME) {
+      throw new Error("S3_BUCKET_NAME is not configured");
+    }
+
     const s3Params = {
-      Bucket: process.env.S3_BUCKET_NAME || "",
+      Bucket: process.env.S3_BUCKET_NAME,
       Key: s3Key,
       Expires: 60,
       ContentType: fileType,
     };
 
-    const uploadUrl = s3.getSignedUrl("putObject", s3Params);
-    const videoUrl = `${process.env.CLOUDFRONT_DOMAIN}/videos/${uniqueId}/${fileName}`;
+    try {
+      const uploadUrl = s3.getSignedUrl("putObject", s3Params);
+      const videoUrl = `${process.env.CLOUDFRONT_DOMAIN}/videos/${uniqueId}/${fileName}`;
 
-    res.json({
-      message: "Upload URL generated successfully",
-      data: { uploadUrl, videoUrl },
-    });
+      res.json({
+        message: "Upload URL generated successfully",
+        data: {
+          uploadUrl,
+          videoUrl,
+          // s3Key,
+          // bucketName: process.env.S3_BUCKET_NAME,
+        },
+      });
+    } catch (s3Error) {
+      console.error("S3 URL Generation Error", {
+        error: s3Error,
+        s3Params,
+        stack: s3Error instanceof Error ? s3Error.stack : "No stack trace",
+      });
+      throw s3Error;
+    }
   } catch (error) {
-    res.status(500).json({ message: "Error generating upload URL", error });
+    console.error("Unexpected Error in getUploadVideoUrl", {
+      error: error instanceof Error ? error.message : String(error),
+      stack: error instanceof Error ? error.stack : "No stack trace",
+      requestBody: req.body,
+    });
+
+    res.status(500).json({
+      message: "Error generating upload URL",
+      error: error instanceof Error ? error.message : String(error),
+    });
   }
 };
+
